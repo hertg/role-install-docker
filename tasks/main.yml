@@ -1,0 +1,65 @@
+---
+
+- name: update system
+  apt:
+    update_cache: true
+    upgrade: true
+
+- name: check if docker is installed
+  command: docker --version
+  register: docker_installed
+  ignore_errors: true
+
+# apparently its needed for docker?
+# https://github.com/docker/for-linux/issues/1199
+- name: install apparmor
+  when: not docker_installed
+  register: apparmor
+  apt:
+    name: apparmor
+    state: present
+
+- name: install aptitude using apt
+  when: not docker_installed
+  apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+
+- name: install required system packages
+  when: not docker_installed
+  apt: name={{ item }} state=latest update_cache=yes
+  loop: [
+    'apt-transport-https',
+    'ca-certificates',
+    'curl',
+    'software-properties-common',
+    'python3-pip',
+    'virtualenv',
+    'python3-setuptools'
+  ]
+
+- name: add docker gpg apt key
+  when: not docker_installed
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+
+- name: add docker repository
+  when: not docker_installed
+  apt_repository:
+    repo: deb https://download.docker.com/linux/debian bullseye stable
+    state: present
+
+- name: update apt and install docker-ce
+  when: not docker_installed
+  apt: name={{ item }} update_cache=yes state=latest
+  loop: [
+    'docker-ce',
+    'docker-ce-cli',
+    'containerd.io',
+    'docker-compose'
+  ]
+
+- name: install docker module for python
+  when: not docker_installed
+  apt:
+    name: python3-docker
+    state: present
