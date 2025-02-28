@@ -14,14 +14,14 @@
 # apparently its needed for docker?
 # https://github.com/docker/for-linux/issues/1199
 - name: Install apparmor
-  when: not docker_installed
+  when: docker_installed.rc != 0
   register: apparmor
   ansible.builtin.apt:
     name: apparmor
     state: present
 
 - name: Install aptitude using apt
-  when: not docker_installed
+  when: docker_installed.rc != 0
   ansible.builtin.apt:
     name: aptitude
     state: present
@@ -29,7 +29,7 @@
     force_apt_get: true
 
 - name: Install required system packages
-  when: not docker_installed
+  when: docker_installed.rc != 0
   ansible.builtin.apt:
     name: "{{ item }}"
     state: present
@@ -45,19 +45,19 @@
   ]
 
 - name: Add docker gpg apt key
-  when: not docker_installed
+  when: docker_installed.rc != 0
   ansible.builtin.apt_key:
     url: https://download.docker.com/linux/debian/gpg
     state: present
 
 - name: Add docker repository
-  when: not docker_installed
+  when: docker_installed.rc != 0
   ansible.builtin.apt_repository:
     repo: deb https://download.docker.com/linux/debian bullseye stable
     state: present
 
 - name: Update apt and install docker-ce
-  when: not docker_installed
+  when: docker_installed.rc != 0
   ansible.builtin.apt:
     name: "{{ item }}"
     update_cache: true
@@ -70,7 +70,7 @@
   ]
 
 - name: Install docker module for python
-  when: not docker_installed
+  when: docker_installed.rc != 0
   ansible.builtin.apt:
     name: python3-docker
     state: present
