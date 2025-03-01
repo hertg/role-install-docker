@@ -74,3 +74,8 @@
   ansible.builtin.apt:
     name: python3-docker
     state: present
+
+- name: Install docker-compose plugin
+  ansible.builtin.apt:
+    name: docker-compose-plugin
+    state: present

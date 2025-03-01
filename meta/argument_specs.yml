@@ -1,1 +1,11 @@
 ---
+
+argument_specs:
+  main:
+    short_description: Install docker
+    author: hertg
+    options:
+      install_docker_compose:
+        type: "bool"
+        description: whether the docker compose plugin should be installed
+        required: true
